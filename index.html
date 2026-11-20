@@ -1,0 +1,918 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff1f5">
+  <title>Little Love Note</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #704e60;
+      --muted: #9c7d8b;
+      --pink: #f5a9c2;
+      --rose: #ee789f;
+      --lavender: #d8c8f5;
+      --butter: #ffe6a5;
+      --mint: #ccebdc;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100svh;
+      margin: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      color: var(--ink);
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+      background:
+        radial-gradient(ellipse at 12% 18%, #fffdf8 0 7%, transparent 32%),
+        radial-gradient(ellipse at 90% 82%, #f8d9e8 0 8%, transparent 33%),
+        linear-gradient(145deg, #fff4f5 0%, #fce4ed 48%, #f4eafa 100%);
+    }
+
+    .scene {
+      position: relative;
+      isolation: isolate;
+      width: min(100%, 470px);
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      margin: 0 auto;
+      padding: 28px 18px;
+    }
+
+    .scene[hidden] { display: none; }
+
+    .note {
+      position: relative;
+      z-index: 2;
+      width: min(100%, 390px);
+      padding: 30px 28px 27px;
+      text-align: center;
+      border: 1px solid rgba(255,255,255,.9);
+      border-radius: 34px;
+      background: rgba(255, 253, 251, .82);
+      box-shadow: 0 24px 70px rgba(183, 116, 145, .18), inset 0 1px 0 white;
+      backdrop-filter: blur(12px);
+      animation: card-arrive 900ms cubic-bezier(.2,.8,.2,1) both;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin: 0 0 16px;
+      padding: 8px 13px;
+      border: 1px solid #f8d8e4;
+      border-radius: 999px;
+      color: #b66c88;
+      background: #fff3f7;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .13em;
+      text-transform: uppercase;
+    }
+
+    .mascots {
+      position: relative;
+      width: 184px;
+      height: 190px;
+      margin: 0 auto 10px;
+      display: grid;
+      place-items: center;
+    }
+
+    .mascots::before {
+      content: "";
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 30%, #fff8df, #ffe8ec 68%, #fbd7e8);
+      box-shadow: 0 13px 28px rgba(223, 151, 174, .16);
+    }
+
+    .bear {
+      position: absolute;
+      z-index: 1;
+      font-size: 94px;
+      line-height: 1;
+      filter: drop-shadow(0 8px 3px rgba(120, 74, 89, .1));
+      animation: cuddle 2.6s ease-in-out infinite;
+    }
+
+    .bear.left { transform: translate(-29px, 10px) rotate(-8deg); }
+    .bear.right {
+      transform: translate(32px, 8px) rotate(8deg) scaleX(-1);
+      animation-delay: -1.3s;
+    }
+
+    .main-heart {
+      position: absolute;
+      z-index: 2;
+      top: 8px;
+      right: 30px;
+      color: var(--rose);
+      font-size: 34px;
+      filter: drop-shadow(0 4px 5px rgba(218, 91, 133, .2));
+      animation: heartbeat 1.15s ease-in-out infinite;
+    }
+
+    .sparkle {
+      position: absolute;
+      z-index: 2;
+      color: #e8b957;
+      animation: twinkle 1.8s ease-in-out infinite;
+    }
+
+    .sparkle.one { top: 29px; left: 18px; font-size: 23px; }
+    .sparkle.two { right: 8px; bottom: 42px; color: #b79be5; font-size: 20px; animation-delay: .6s; }
+    .sparkle.three { left: 20px; bottom: 32px; color: #ef9eb7; font-size: 17px; animation-delay: 1s; }
+
+    h1 {
+      margin: 4px 0 11px;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(29px, 8vw, 37px);
+      font-weight: 700;
+      letter-spacing: -.045em;
+      line-height: 1.13;
+    }
+
+    h1 span {
+      color: #e67f9f;
+      font-style: italic;
+    }
+
+    .message {
+      max-width: 285px;
+      margin: 0 auto 21px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .hug-button {
+      position: relative;
+      overflow: hidden;
+      min-height: 49px;
+      padding: 0 21px;
+      border: 0;
+      border-radius: 999px;
+      color: white;
+      background: linear-gradient(135deg, #f3a5bd, #e87fa1);
+      box-shadow: 0 8px 18px rgba(224, 120, 155, .27), inset 0 1px 0 rgba(255,255,255,.38);
+      font: inherit;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .hug-button:hover { transform: translateY(-3px); box-shadow: 0 12px 22px rgba(224, 120, 155, .34); }
+    .hug-button:active { transform: translateY(0) scale(.97); }
+    .hug-button:focus-visible { outline: 3px solid #c09ce9; outline-offset: 4px; }
+
+    .album-button {
+      display: block;
+      margin: 14px auto 0;
+      padding: 9px 14px;
+      border: 0;
+      border-radius: 999px;
+      color: #a76d88;
+      background: #faeaf0;
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: background 180ms ease, transform 180ms ease;
+    }
+
+    .album-button:hover { transform: translateY(-2px); background: #f7dce7; }
+    .album-button:focus-visible,
+    .album-control:focus-visible { outline: 3px solid #c09ce9; outline-offset: 4px; }
+
+    .memories {
+      width: min(100%, 900px);
+      min-height: 100svh;
+      margin: 0 auto;
+      padding: 42px 18px 54px;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .memories[hidden] { display: none; }
+
+    .memories-heading {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(30px, 7vw, 43px);
+      letter-spacing: -.04em;
+      line-height: 1.15;
+    }
+
+    .memories-heading span { color: #e67f9f; font-style: italic; }
+
+    .memories-intro {
+      margin: -5px 0 2px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .photo-frame {
+      position: relative;
+      width: min(82vw, 370px);
+      height: min(48svh, 460px);
+      min-height: 270px;
+      overflow: hidden;
+      padding: 9px;
+      touch-action: pan-y;
+      border: 1px solid rgba(255,255,255,.9);
+      border-radius: 28px;
+      background: rgba(255, 253, 251, .82);
+      box-shadow: 0 20px 55px rgba(183, 116, 145, .22);
+      transform: rotate(-1.5deg);
+      transition: transform 250ms ease;
+    }
+
+    .photo-frame:hover { transform: rotate(0) translateY(-3px); }
+
+    .photo-frame img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      background: linear-gradient(145deg, #fff1f5, #f1e7fb);
+      object-fit: contain;
+    }
+
+    .photo-frame video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      border-radius: 20px;
+      background: #2b2026;
+      object-fit: contain;
+    }
+
+    .photo-frame [hidden] { display: none; }
+
+    .final-note {
+      width: 100%;
+      height: 100%;
+      padding: 26px 22px;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      gap: 12px;
+      border-radius: 20px;
+      background:
+        radial-gradient(circle at 85% 15%, rgba(255,255,255,.9), transparent 25%),
+        linear-gradient(145deg, #fff5d9, #ffe5ef 58%, #eee4fb);
+    }
+
+    .final-note[hidden] { display: none; }
+    .final-note-icon { font-size: 58px; animation: cuddle 2.6s ease-in-out infinite; }
+    .final-note h3 {
+      margin: 0;
+      color: #88556e;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(24px, 6vw, 32px);
+      line-height: 1.15;
+    }
+
+    .final-note p {
+      max-width: 290px;
+      margin: 0;
+      color: #896a7a;
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .photo-frame.is-changing img {
+      animation: photo-arrive 650ms cubic-bezier(.2,.8,.2,1) both;
+    }
+
+    .unlock-panel {
+      width: min(100%, 410px);
+      padding: 16px 18px;
+      display: grid;
+      gap: 9px;
+      border: 1px solid rgba(255,255,255,.9);
+      border-radius: 22px;
+      background: rgba(255, 253, 251, .82);
+      box-shadow: 0 10px 28px rgba(183, 116, 145, .12);
+      text-align: left;
+    }
+
+    .unlock-panel[hidden],
+    #riddleForm[hidden] { display: none; }
+
+    .unlock-title {
+      margin: 0;
+      color: #9c617d;
+      font-size: 15px;
+      text-align: center;
+    }
+
+    .unlock-label,
+    .riddle-answer-label {
+      color: #896a7a;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .unlock-slider {
+      width: 100%;
+      margin: 0;
+      accent-color: #e77fa0;
+      cursor: grab;
+    }
+
+    .unlock-slider:active { cursor: grabbing; }
+    .unlock-slider:disabled { cursor: default; }
+
+    .unlock-status,
+    .riddle-feedback {
+      min-height: 17px;
+      margin: 0;
+      color: #aa8494;
+      font-size: 11px;
+      text-align: center;
+    }
+
+    #riddleForm {
+      display: grid;
+      gap: 8px;
+      padding-top: 5px;
+    }
+
+    .riddle-question {
+      margin: 0;
+      color: #704e60;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: 16px;
+      line-height: 1.45;
+      text-align: center;
+    }
+
+    .riddle-answer-row {
+      display: flex;
+      gap: 8px;
+    }
+
+    .riddle-answer {
+      min-width: 0;
+      flex: 1;
+      padding: 10px 12px;
+      border: 1px solid #f1d6e0;
+      border-radius: 13px;
+      color: var(--ink);
+      background: white;
+      font: inherit;
+      font-size: 13px;
+    }
+
+    .riddle-answer:focus-visible { outline: 3px solid #e8bfd0; outline-offset: 2px; }
+
+    .riddle-submit {
+      padding: 0 14px;
+      border: 0;
+      border-radius: 13px;
+      color: white;
+      background: linear-gradient(135deg, #f3a5bd, #e87fa1);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .riddle-submit:disabled { opacity: .6; cursor: default; }
+
+    .surprise-area {
+      display: grid;
+      justify-items: center;
+      gap: 7px;
+    }
+
+    .surprise-button {
+      min-height: 40px;
+      padding: 0 16px;
+      border: 1px solid #f3d4e0;
+      border-radius: 999px;
+      color: #a45f7e;
+      background: linear-gradient(135deg, #fff8df, #ffe8f0);
+      box-shadow: 0 5px 14px rgba(183, 116, 145, .12);
+      font: inherit;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .surprise-button:hover { transform: translateY(-2px) rotate(-1deg); box-shadow: 0 8px 18px rgba(183, 116, 145, .2); }
+    .surprise-button:focus-visible { outline: 3px solid #c09ce9; outline-offset: 4px; }
+
+    .surprise-message {
+      min-height: 17px;
+      margin: 0;
+      color: #aa8494;
+      font-size: 11px;
+    }
+
+    .album-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
+    }
+
+    .album-control {
+      min-width: 42px;
+      min-height: 42px;
+      border: 1px solid #f4d8e3;
+      border-radius: 50%;
+      color: #bd6f8d;
+      background: rgba(255,255,255,.78);
+      font: inherit;
+      font-size: 19px;
+      cursor: pointer;
+      transition: transform 180ms ease, background 180ms ease;
+    }
+
+    .album-control:hover { transform: scale(1.08); background: white; }
+    .album-control:disabled { opacity: .45; transform: none; cursor: not-allowed; }
+
+    .photo-count {
+      min-width: 58px;
+      color: #a88796;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .12em;
+    }
+
+    .memory-dots {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .memory-dot {
+      display: block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #e9cbd8;
+      transition: transform 180ms ease, background 180ms ease;
+    }
+
+    .memory-dot[aria-current="true"] { transform: scale(1.35); background: #e77fa0; }
+
+    .return-button {
+      margin-top: 0;
+      background: rgba(255,255,255,.65);
+    }
+
+    .signature {
+      margin: 17px 0 0;
+      color: #bd9aa9;
+      font-size: 11px;
+      letter-spacing: .06em;
+    }
+
+    .floaty {
+      position: absolute;
+      z-index: -1;
+      opacity: .8;
+      animation: drift 7s ease-in-out infinite;
+      user-select: none;
+    }
+
+    .floaty.heart-a { top: 9%; left: 5%; color: #ef9db7; font-size: 30px; }
+    .floaty.heart-b { top: 17%; right: 3%; color: #d6b8eb; font-size: 24px; animation-delay: -2s; }
+    .floaty.star-a { top: 36%; left: 0; color: #e7bd60; font-size: 25px; animation-delay: -4s; }
+    .floaty.flower { right: 2%; bottom: 28%; color: #ef9db7; font-size: 29px; animation-delay: -1s; }
+    .floaty.heart-c { bottom: 8%; left: 12%; color: #e99bb8; font-size: 23px; animation-delay: -3s; }
+    .floaty.star-b { right: 14%; bottom: 5%; color: #bc9fe4; font-size: 25px; animation-delay: -5s; }
+
+    .confetti {
+      position: fixed;
+      z-index: 5;
+      top: var(--origin-y, 50%);
+      left: var(--origin-x, 50%);
+      pointer-events: none;
+      font-size: var(--size, 22px);
+      animation: burst 1.25s cubic-bezier(.15,.7,.25,1) forwards;
+    }
+
+    @keyframes card-arrive {
+      from { opacity: 0; transform: translateY(22px) scale(.96); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes cuddle {
+      0%, 100% { translate: 0 0; }
+      50% { translate: 0 -7px; }
+    }
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1) rotate(8deg); }
+      18% { transform: scale(1.2) rotate(8deg); }
+      34% { transform: scale(1) rotate(8deg); }
+      50% { transform: scale(1.12) rotate(8deg); }
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: .45; transform: scale(.8) rotate(0); }
+      50% { opacity: 1; transform: scale(1.15) rotate(18deg); }
+    }
+    @keyframes drift {
+      0%, 100% { translate: 0 0; rotate: -8deg; }
+      50% { translate: 7px -16px; rotate: 9deg; }
+    }
+    @keyframes burst {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(.3); }
+      15% { opacity: 1; }
+      100% {
+        opacity: 0;
+        transform: translate(calc(-50% + var(--x)), calc(-50% + var(--y))) rotate(var(--turn)) scale(1.2);
+      }
+    }
+    @keyframes photo-arrive {
+      from { opacity: 0; transform: scale(1.035) rotate(1deg); filter: blur(7px); }
+      to { opacity: 1; transform: scale(1) rotate(0); filter: blur(0); }
+    }
+    @keyframes view-leave {
+      to { opacity: 0; transform: translateY(-15px) scale(.98); }
+    }
+    @keyframes view-arrive {
+      from { opacity: 0; transform: translateY(18px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .note.is-leaving { animation: view-leave 300ms ease forwards; }
+    .memories.is-arriving { animation: view-arrive 500ms ease both; }
+
+    @media (max-width: 380px) {
+      .scene { min-height: 100svh; }
+      .note { padding: 25px 20px 23px; }
+      .mascots { transform: scale(.9); margin-top: -7px; margin-bottom: 0; }
+      .photo-frame { height: min(43svh, 400px); min-height: 250px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="scene" aria-label="Kartu animasi penuh kasih sayang">
+    <span class="floaty heart-a" aria-hidden="true">♥</span>
+    <span class="floaty heart-b" aria-hidden="true">♡</span>
+    <span class="floaty star-a" aria-hidden="true">✦</span>
+    <span class="floaty flower" aria-hidden="true">✿</span>
+    <span class="floaty heart-c" aria-hidden="true">♥</span>
+    <span class="floaty star-b" aria-hidden="true">✧</span>
+
+    <section class="note">
+      <p class="eyebrow"><span aria-hidden="true">♡</span> a little love note <span aria-hidden="true">♡</span></p>
+      <div class="mascots" aria-label="Dua beruang kecil sedang berpelukan">
+        <span class="sparkle one" aria-hidden="true">✦</span>
+        <span class="bear left" aria-hidden="true">🧸</span>
+        <span class="bear right" aria-hidden="true">🧸</span>
+        <span class="main-heart" aria-hidden="true">♥</span>
+        <span class="sparkle two" aria-hidden="true">✧</span>
+        <span class="sparkle three" aria-hidden="true">♡</span>
+      </div>
+      <h1>Kamu bikin hari jadi <span>lebih manis.</span></h1>
+      <p class="message" id="message">Semoga hari ini dipenuhi hal-hal kecil yang bikin kamu tersenyum. Kamu pantas dapat banyak cinta! ♡</p>
+      <button class="hug-button" id="hugButton" type="button">Kirim peluk virtual <span aria-hidden="true">♡</span></button>
+      <button class="album-button" id="openAlbum" type="button">Lihat foto-foto kita ♡</button>
+      <p class="signature">dibuat dengan banyak cinta ✿</p>
+    </section>
+  </main>
+
+  <section class="memories" id="memories" aria-labelledby="memoriesHeading" hidden>
+    <p class="eyebrow"><span aria-hidden="true">✿</span> our little memories <span aria-hidden="true">✿</span></p>
+    <h2 class="memories-heading" id="memoriesHeading">Potongan cerita <span>kita</span></h2>
+    <p class="memories-intro">Geser hati, jawab teka-teki kecil, lalu buka kenangan berikutnya ♡</p>
+    <div class="photo-frame" id="photoFrame">
+      <img id="memoryPhoto" src="photos/01-video-call.jpeg" alt="Momen lucu saat video call" fetchpriority="high" draggable="false">
+      <video id="memoryVideo" controls playsinline preload="metadata" hidden aria-label="Video kenangan bersama"></video>
+      <div class="final-note" id="finalNote" hidden>
+        <span class="final-note-icon" aria-hidden="true">📚💖</span>
+        <h3>Semangat kuliahnya, yaa!</h3>
+        <p>Semester satu masih adaptasi, jadi nggak perlu buru-buru bisa semuanya. Kalau capek, istirahat dulu, jangan lupa makan juga. Aku di sini kalau kamu mau cerita, ya 🤍</p>
+        <span aria-hidden="true">✨ 🌷 ✨</span>
+      </div>
+    </div>
+    <section class="unlock-panel" id="unlockPanel" aria-labelledby="unlockTitle">
+      <h3 class="unlock-title" id="unlockTitle">Geser dulu, yuk! 💌</h3>
+      <label class="unlock-label" for="unlockSlider">Geser hati sampai penuh untuk membuka teka-teki</label>
+      <input class="unlock-slider" id="unlockSlider" type="range" min="0" max="100" value="0" aria-describedby="unlockStatus">
+      <p class="unlock-status" id="unlockStatus" aria-live="polite">Pelan-pelan saja, sampai ujung ya ♡</p>
+      <form id="riddleForm" hidden>
+        <p class="riddle-question" id="riddleQuestion"></p>
+        <label class="riddle-answer-label" for="riddleAnswer">Jawabanmu</label>
+        <div class="riddle-answer-row">
+          <input class="riddle-answer" id="riddleAnswer" type="text" autocomplete="off" required>
+          <button class="riddle-submit" id="answerRiddle" type="submit">Jawab ♡</button>
+        </div>
+        <p class="riddle-feedback" id="riddleFeedback" aria-live="polite"></p>
+      </form>
+    </section>
+    <div class="surprise-area">
+      <button class="surprise-button" id="surpriseButton" type="button">Kirim kejutan kecil ✨</button>
+      <p class="surprise-message" id="surpriseMessage" aria-live="polite">Ada kejutan kecil buat kamu ♡</p>
+    </div>
+    <div class="album-controls" aria-label="Kontrol album foto">
+      <button class="album-control" id="previousPhoto" type="button" aria-label="Kenangan sebelumnya" disabled>‹</button>
+      <span class="photo-count" id="photoCount" aria-live="polite">01 / 15</span>
+      <button class="album-control" id="nextPhoto" type="button" aria-label="Buka kenangan berikutnya setelah menjawab teka-teki" disabled>›</button>
+    </div>
+    <div class="memory-dots" id="memoryDots" role="list" aria-label="Progres kenangan"></div>
+    <button class="album-button return-button" id="backToNote" type="button">Kembali ke kartu ♡</button>
+  </section>
+
+  <script>
+    const button = document.querySelector("#hugButton");
+    const message = document.querySelector("#message");
+    const pieces = ["♥", "♡", "✦", "✿", "♥", "♡"];
+    const note = document.querySelector(".note");
+    const memories = document.querySelector("#memories");
+    const openAlbum = document.querySelector("#openAlbum");
+    const backToNote = document.querySelector("#backToNote");
+    const photoFrame = document.querySelector("#photoFrame");
+    const memoryPhoto = document.querySelector("#memoryPhoto");
+    const memoryVideo = document.querySelector("#memoryVideo");
+    const finalNote = document.querySelector("#finalNote");
+    const photoCount = document.querySelector("#photoCount");
+    const memoryDots = document.querySelector("#memoryDots");
+    const unlockPanel = document.querySelector("#unlockPanel");
+    const unlockSlider = document.querySelector("#unlockSlider");
+    const unlockStatus = document.querySelector("#unlockStatus");
+    const riddleForm = document.querySelector("#riddleForm");
+    const riddleQuestion = document.querySelector("#riddleQuestion");
+    const riddleAnswer = document.querySelector("#riddleAnswer");
+    const riddleFeedback = document.querySelector("#riddleFeedback");
+    const answerRiddle = document.querySelector("#answerRiddle");
+    const previousPhotoButton = document.querySelector("#previousPhoto");
+    const nextPhotoButton = document.querySelector("#nextPhoto");
+    const surpriseButton = document.querySelector("#surpriseButton");
+    const surpriseMessage = document.querySelector("#surpriseMessage");
+    const surpriseMessages = [
+      "Hehe, semoga kamu senyum bacanya ♡",
+      "Kirim peluk jauh dulu yaa 🤗",
+      "Jangan lupa istirahat dan makan, ya 🌷",
+      "Kamu selalu jadi bagian manis di hariku 💖"
+    ];
+    const confettiColors = ["#e77fa0", "#b89bdd", "#e7b958", "#8dbfa6"];
+    const slideConfetti = ["♡", "✦", "🌸", "✨", "💖"];
+    const slides = [
+      { type: "photo", src: "photos/01-video-call.jpeg", alt: "Momen lucu saat video call" },
+      { type: "photo", src: "photos/02-zoo-walk.jpeg", alt: "Jalan-jalan di kebun binatang" },
+      { type: "photo", src: "photos/03-camel-day.jpeg", alt: "Berfoto bersama unta saat jalan-jalan" },
+      { type: "photo", src: "photos/04-plushie-selfie.jpeg", alt: "Selfie bersama boneka orangutan" },
+      { type: "photo", src: "photos/05-together-cafe.jpeg", alt: "Foto berdua saat duduk bersama" },
+      { type: "photo", src: "photos/06-together-photo.jpeg", alt: "Foto berdua sambil pose peace" },
+      { type: "photo", src: "photos/07-funny-filter.jpeg", alt: "Selfie dengan filter lucu" },
+      { type: "photo", src: "photos/08-football-call.jpeg", alt: "Momen lucu memakai bola sebagai topi" },
+      { type: "photo", src: "photos/WhatsApp Image 2026-11-19 at 14.49.19.jpeg", alt: "Bersenda gurau di toko saat jalan bersama" },
+      { type: "photo", src: "photos/WhatsApp Image 2026-11-19 at 14.49.19 (1).jpeg", alt: "Memilih barang bersama di toko" },
+      { type: "photo", src: "photos/WhatsApp Image 2026-11-19 at 14.49.19 (2).jpeg", alt: "Duduk di troli saat bercanda di toko" },
+      { type: "photo", src: "photos/WhatsApp Image 2026-11-19 at 14.49.23.jpeg", alt: "Kolase foto-foto saat jalan bersama" },
+      { type: "video", src: "photos/WhatsApp Video 2026-11-19 at 14.49.20.mp4", alt: "Video kenangan saat jalan bersama" },
+      { type: "video", src: "photos/WhatsApp Video 2026-11-19 at 14.49.22.mp4", alt: "Video lucu saat menghabiskan waktu bersama" },
+      { type: "closing" }
+    ];
+    const riddles = [
+      { question: "Aku bulat muncul di langit malam, kadang terlihat penuh, kadang hanya sabit. Aku apa?", answers: ["bulan"] },
+      { question: "Aku punya jarum, tapi nggak menjahit. Aku bantu kamu melihat waktu. Aku apa?", answers: ["jam"] },
+      { question: "Kalau hujan turun, aku dibuka di atas kepala. Aku apa?", answers: ["payung"] },
+      { question: "Aku punya banyak halaman, bisa berisi cerita atau pelajaran. Aku apa?", answers: ["buku"] },
+      { question: "Aku berbunyi saat tombol di depan rumah ditekan. Aku apa?", answers: ["bel"] },
+      { question: "Aku hewan berkumis yang suka bilang “meong”. Aku siapa?", answers: ["kucing"] },
+      { question: "Aku kelihatan kecil dan berkelip di langit malam. Aku apa?", answers: ["bintang"] },
+      { question: "Aku camilan dingin yang sering ada rasa cokelat atau vanila. Aku apa?", answers: ["es krim", "eskrim"] },
+      { question: "Aku dipakai buat mengambil foto supaya momennya nggak hilang. Aku apa?", answers: ["kamera"] },
+      { question: "Gigiku banyak, tapi nggak bisa makan. Aku dipakai buat merapikan rambut. Aku apa?", answers: ["sisir"] },
+      { question: "Aku punya sayap warna-warni dan suka hinggap di bunga. Aku apa?", answers: ["kupu-kupu", "kupu kupu", "kupu"] },
+      { question: "Kevin ulang tahun tanggal 29 Maret 2005. Ulang tahunnya tanggal berapa?", answers: ["29", "29 maret", "29/3", "29/03"] },
+      { question: "Aku punya dua roda dan bisa berjalan kalau dikayuh. Aku apa?", answers: ["sepeda"] },
+      { question: "Aku empuk, ada di kasur, dan biasanya dipeluk saat tidur. Aku apa?", answers: ["bantal"] }
+    ];
+    let activePhoto = 0;
+    let pointerStartX = null;
+    const unlockedSlides = new Set();
+    const revealedRiddles = new Set();
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+
+    function emitConfetti(x, y, shapes, count) {
+      for (let index = 0; index < count; index++) {
+        const confetti = document.createElement("span");
+        const angle = (Math.PI * 2 * index) / count + (Math.random() - .5) * .35;
+        const distance = 55 + Math.random() * 85;
+        confetti.className = "confetti";
+        confetti.textContent = shapes[index % shapes.length];
+        confetti.setAttribute("aria-hidden", "true");
+        confetti.style.setProperty("--origin-x", `${x}px`);
+        confetti.style.setProperty("--origin-y", `${y}px`);
+        confetti.style.setProperty("--x", `${Math.cos(angle) * distance}px`);
+        confetti.style.setProperty("--y", `${Math.sin(angle) * distance}px`);
+        confetti.style.setProperty("--turn", `${Math.random() * 90 - 45}deg`);
+        confetti.style.setProperty("--size", `${18 + Math.random() * 12}px`);
+        confetti.style.color = confettiColors[index % confettiColors.length];
+        document.body.append(confetti);
+        window.setTimeout(() => confetti.remove(), 1400);
+      }
+    }
+
+    function normalizeAnswer(value) {
+      return value.trim().toLocaleLowerCase("id").normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9]/g, "");
+    }
+
+    function updateChallenge() {
+      const hasNext = activePhoto < riddles.length;
+      const isUnlocked = unlockedSlides.has(activePhoto);
+      const riddleIsRevealed = revealedRiddles.has(activePhoto);
+      unlockPanel.hidden = !hasNext;
+      nextPhotoButton.hidden = !hasNext;
+      previousPhotoButton.disabled = activePhoto === 0;
+      nextPhotoButton.disabled = !isUnlocked;
+
+      if (!hasNext) return;
+
+      unlockSlider.value = riddleIsRevealed ? "100" : "0";
+      unlockSlider.disabled = riddleIsRevealed;
+      riddleForm.hidden = !riddleIsRevealed;
+      riddleQuestion.textContent = riddles[activePhoto].question;
+      riddleAnswer.value = "";
+      riddleAnswer.disabled = isUnlocked;
+      answerRiddle.disabled = isUnlocked;
+      unlockStatus.textContent = isUnlocked
+        ? "Teka-tekinya sudah terjawab. Kenangan berikutnya terbuka! ♡"
+        : riddleIsRevealed
+          ? "Teka-tekinya terbuka! Jawab dulu, ya 💌"
+          : "Geser sampai penuh untuk membuka teka-teki ♡";
+      riddleFeedback.textContent = isUnlocked ? "Betul! Kamu hebat 💖" : "";
+    }
+
+    function showPhoto(index) {
+      activePhoto = (index + slides.length) % slides.length;
+      const photo = slides[activePhoto];
+      photoFrame.classList.remove("is-changing");
+      memoryVideo.pause();
+      if (memoryVideo.hasAttribute("src")) {
+        memoryVideo.removeAttribute("src");
+        memoryVideo.load();
+      }
+      memoryPhoto.hidden = photo.type !== "photo";
+      memoryVideo.hidden = photo.type !== "video";
+      finalNote.hidden = photo.type !== "closing";
+      if (photo.type === "photo") {
+        memoryPhoto.src = photo.src;
+        memoryPhoto.alt = photo.alt;
+      } else if (photo.type === "video") {
+        memoryVideo.src = photo.src;
+        memoryVideo.setAttribute("aria-label", photo.alt);
+        memoryVideo.load();
+      }
+      photoCount.textContent = `${String(activePhoto + 1).padStart(2, "0")} / ${String(slides.length).padStart(2, "0")}`;
+      Array.from(memoryDots.children).forEach((dot, dotIndex) => {
+        dot.setAttribute("aria-current", dotIndex === activePhoto ? "step" : "false");
+      });
+      updateChallenge();
+      void photoFrame.offsetWidth;
+      photoFrame.classList.add("is-changing");
+      const frame = photoFrame.getBoundingClientRect();
+      emitConfetti(frame.left + frame.width / 2, frame.top + frame.height / 2, slideConfetti, 5);
+    }
+
+    slides.forEach((photo, index) => {
+      const dot = document.createElement("span");
+      dot.className = "memory-dot";
+      dot.setAttribute("role", "listitem");
+      dot.setAttribute("aria-label", `Kenangan ${index + 1}`);
+      dot.setAttribute("aria-current", index === activePhoto ? "step" : "false");
+      memoryDots.append(dot);
+    });
+
+    unlockSlider.addEventListener("input", () => {
+      if (Number(unlockSlider.value) < 100) {
+        unlockStatus.textContent = "Dikit lagi, geser sampai ujung 💖";
+        return;
+      }
+
+      revealedRiddles.add(activePhoto);
+      unlockSlider.disabled = true;
+      riddleQuestion.textContent = riddles[activePhoto].question;
+      riddleForm.hidden = false;
+      unlockStatus.textContent = "Yeay! Ada teka-teki kecil buat kamu 💌";
+      riddleFeedback.textContent = "";
+      riddleAnswer.value = "";
+      riddleAnswer.focus();
+    });
+
+    riddleForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const answer = normalizeAnswer(riddleAnswer.value);
+      const acceptedAnswers = riddles[activePhoto].answers.map(normalizeAnswer);
+
+      if (acceptedAnswers.includes(answer)) {
+        unlockedSlides.add(activePhoto);
+        riddleAnswer.disabled = true;
+        answerRiddle.disabled = true;
+        nextPhotoButton.disabled = false;
+        unlockStatus.textContent = "Jawabanmu benar! Kenangan berikutnya sudah terbuka ♡";
+        riddleFeedback.textContent = "Yeay, betul! Tinggal buka foto berikutnya ✨";
+        return;
+      }
+
+      riddleFeedback.textContent = "Hampir! Coba lagi, yaa ♡";
+      riddleAnswer.select();
+    });
+
+    previousPhotoButton.addEventListener("click", () => {
+      if (activePhoto > 0) showPhoto(activePhoto - 1);
+    });
+
+    nextPhotoButton.addEventListener("click", () => {
+      if (unlockedSlides.has(activePhoto)) showPhoto(activePhoto + 1);
+    });
+
+    photoFrame.addEventListener("pointerdown", (event) => {
+      if (event.target === memoryVideo) return;
+      pointerStartX = event.clientX;
+    });
+
+    document.addEventListener("pointerup", (event) => {
+      if (pointerStartX === null) return;
+      const distance = event.clientX - pointerStartX;
+      pointerStartX = null;
+      if (Math.abs(distance) < 45) return;
+      if (distance < 0 && unlockedSlides.has(activePhoto)) {
+        showPhoto(activePhoto + 1);
+      } else if (distance > 0 && activePhoto > 0) {
+        showPhoto(activePhoto - 1);
+      }
+    });
+
+    document.addEventListener("pointercancel", () => {
+      pointerStartX = null;
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (memories.hidden) return;
+      if (event.target instanceof HTMLElement && event.target.closest("input, button, video")) return;
+      if (event.key === "ArrowRight" && unlockedSlides.has(activePhoto)) {
+        showPhoto(activePhoto + 1);
+      } else if (event.key === "ArrowLeft") {
+        if (activePhoto > 0) showPhoto(activePhoto - 1);
+      }
+    });
+
+    openAlbum.addEventListener("click", () => {
+      note.classList.add("is-leaving");
+      window.setTimeout(() => {
+        document.querySelector(".scene").hidden = true;
+        memories.hidden = false;
+        memories.classList.add("is-arriving");
+        showPhoto(activePhoto);
+        memories.scrollIntoView({ behavior: reducedMotion.matches ? "auto" : "smooth" });
+      }, 280);
+    });
+
+    backToNote.addEventListener("click", () => {
+      memories.hidden = true;
+      memories.classList.remove("is-arriving");
+      note.classList.remove("is-leaving");
+      document.querySelector(".scene").hidden = false;
+      document.querySelector(".scene").scrollIntoView({ behavior: reducedMotion.matches ? "auto" : "smooth" });
+      openAlbum.focus();
+    });
+
+    surpriseButton.addEventListener("click", (event) => {
+      const bounds = surpriseButton.getBoundingClientRect();
+      const x = event.clientX || bounds.left + bounds.width / 2;
+      const y = event.clientY || bounds.top + bounds.height / 2;
+      emitConfetti(x, y, ["💖", "🌸", "🧸", "✨", "🎀", "🌷", "♡"], 14);
+      surpriseMessage.textContent = surpriseMessages[Math.floor(Math.random() * surpriseMessages.length)];
+    });
+
+    button.addEventListener("click", () => {
+      message.textContent = "Peluk virtual terkirim! Semoga kamu merasa disayang dari jauh ♡";
+      button.innerHTML = 'Peluk terkirim! <span aria-hidden="true">💌</span>';
+      emitConfetti(window.innerWidth / 2, window.innerHeight / 2, pieces, pieces.length);
+    });
+  </script>
+</body>
+</html>
